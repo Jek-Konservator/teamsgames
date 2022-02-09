@@ -1,24 +1,54 @@
-import React, { useState } from "react";
+import React from "react";
 import "./styled.css";
 import { GoGameModal } from "../goGameModal";
-import {NewRoomModal} from "../newRoomModal";
+import { NewRoomModal } from "../newRoomModal";
+import { useDispatch, useSelector } from "react-redux";
+import { Login } from "../login";
+import { UserRoomModal } from "../userRoomModal";
+import { GameSelect } from "../gameSelect";
+
 export const Main = () => {
-  const [visibleGoGameModal, setVisibleGoGameModal] = useState(false);
-  const [visibleNewRoomModal, setVisibleNewRoomModal] = useState(false);
+  const {idUserRoom} = useSelector(({ mainReducer }) => mainReducer);
+
+  const dispatch = useDispatch();
+
+  const noGameRooms = () => {
+    console.log("no Game Rooms");
+  };
 
   return (
     <div className="mainStyled">
       <button
         onClick={() => {
-          setVisibleGoGameModal(true);
+          dispatch({ type: "openModal", data: "visibleGoGameModal" });
         }}
         className="buttonGoGameStyled"
       >
         Играть
       </button>
-      <button onClick={()=>{setVisibleNewRoomModal(true)}} className="buttonNewRoomStyled">Создать новую комнату</button>
-      {visibleGoGameModal && <GoGameModal />}
-      {visibleNewRoomModal && <NewRoomModal />}
+
+      <GameSelect
+        width={"150px"}
+        onChangeFunction={(e) =>
+          dispatch({ type: "gameSelected", data: e.target.value })
+        }
+      />
+      <button
+        onClick={() => {
+          idUserRoom === ""
+            ? dispatch({ type: "openModal", data: "visibleNewRoomModal" })
+            : dispatch({ type: "openModal", data: "visibleUserRoomModal" });
+        }}
+        className="buttonNewRoomStyled"
+      >
+        {idUserRoom === "" ? "Создать новую комнату" : " Моя комната"}
+      </button>
+      <Login />
+      <UserRoomModal />
+      <GoGameModal noGameRooms={noGameRooms} />
+      <NewRoomModal />
     </div>
   );
 };
+
+//TODO Нихуй не работает, (не выидит комнату при играть!!!)

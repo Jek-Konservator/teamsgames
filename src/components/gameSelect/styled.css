@@ -1,0 +1,7 @@
+.selectStyled {
+    width: 350px;
+    height: 35px;
+    margin: 5px;
+    border: 2px solid black;
+    border-radius: 10px;
+}

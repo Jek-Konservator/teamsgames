@@ -10,11 +10,13 @@
 .imageLogoStyled {
   width: 143px;
   height: 50px;
+  cursor: pointer;
 }
 
 .buttonProfileStyled {
   width: 100px;
   height: 30px;
+  margin-left: 10px;
   border: none;
   border-radius: 10px;
   background-color: black;
