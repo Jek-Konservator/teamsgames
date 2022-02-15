@@ -1,7 +1,8 @@
 import React from "react";
 import "./styled.css";
 export const GameSelect = ({ onChangeFunction, width }) => {
-  return (
+
+    return (
     <div>
       <select
         style={{ width }}
@@ -9,16 +10,18 @@ export const GameSelect = ({ onChangeFunction, width }) => {
         className="selectStyled"
         placeholder="игра"
       >
-        {[
-          { name: "" },
-          { name: "Apex Legends" },
-          { name: "Dota 2" },
-          { name: "PUBG" },
-          { name: "Genshin Impact" },
-        ].map((game) => {
-          return <option key={game.name} className="optionSelectStyled">{game.name}</option>;
+        {GAMES.map(({name}) => {
+          return <option key={name} className="optionSelectStyled">{name}</option>;
         })}
       </select>
     </div>
   );
 };
+
+const GAMES = [
+    { name: "" },
+    { name: "Apex Legends" },
+    { name: "Dota 2" },
+    { name: "PUBG" },
+    { name: "Genshin Impact" },
+];

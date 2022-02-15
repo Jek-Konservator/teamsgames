@@ -15,3 +15,6 @@ function App() {
 }
 
 export default App;
+
+//TODO NEXT + REDUX,React context, NEXT.Js Api, Next Build next start Docker
+//TODO +1 уровоень в components grope
