@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import "./styled.css";
+import "./goGameModal.module.css";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { v4 } from "uuid";

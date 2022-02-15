@@ -1,30 +1,28 @@
 import React from "react";
-import "./styled.css";
+import "./headerStyle.module";
 import logo from "../../image/logo.png";
-import { useDispatch } from "react-redux";
-export const Header = () => {
-  const dispatch = useDispatch();
+import Image from "next/image";
 
+import {
+  ButtonProfileStyled,
+  HeaderStyled,
+  ImageLogoStyled,
+} from "./headerStyle.module";
+export const Header = () => {
   return (
-    <div className="headerStyled">
-      <img
-        onClick={() => dispatch({ type: "closeModals" })}
-        className="imageLogoStyled"
-        src={logo}
-        alt="logo"
-      />
+    <HeaderStyled>
+      <ImageLogoStyled>
+        <Image layout="intrinsic" src={logo} alt="logo" />
+      </ImageLogoStyled>
 
       <div>
-        <button className="buttonProfileStyled">User</button>
-        <button
-          onClick={() => {
-            dispatch({ type: "openModal", data: "visibleLoginModal" });
-          }}
-          className="buttonProfileStyled"
-        >
+        <ButtonProfileStyled className="buttonProfileStyled">
+          User
+        </ButtonProfileStyled>
+        <ButtonProfileStyled className="buttonProfileStyled">
           Войти
-        </button>
+        </ButtonProfileStyled>
       </div>
-    </div>
+    </HeaderStyled>
   );
 };

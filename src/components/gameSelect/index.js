@@ -1,27 +1,18 @@
 import React from "react";
-import "./styled.css";
-export const GameSelect = ({ onChangeFunction, width }) => {
+import "./gameSelectStyle.module";
+import { GameAutocompleteStyled } from "./gameSelectStyle.module";
+import { TextField } from "@mui/material";
+export const GameSelect = ({ onChangeFunction, sx }) => {
+  return (
+    <>
+      <GameAutocompleteStyled
 
-    return (
-    <div>
-      <select
-        style={{ width }}
-        onChange={onChangeFunction}
-        className="selectStyled"
-        placeholder="игра"
-      >
-        {GAMES.map(({name}) => {
-          return <option key={name} className="optionSelectStyled">{name}</option>;
-        })}
-      </select>
-    </div>
+          sx={sx}
+        options={GAMES}
+        renderInput={(params) => <TextField {...params} placeholder="Игра" />}
+      />
+    </>
   );
 };
 
-const GAMES = [
-    { name: "" },
-    { name: "Apex Legends" },
-    { name: "Dota 2" },
-    { name: "PUBG" },
-    { name: "Genshin Impact" },
-];
+const GAMES = ["Apex Legends", "Dota 2", "PUBG", "Genshin Impact"];

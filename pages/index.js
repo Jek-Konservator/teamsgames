@@ -1,14 +1,11 @@
-import React from 'react';
-import {Main} from "../src/components/main";
 import {Header} from "../src/components/header";
+import {Main} from "../src/components/main";
 
 const Index = () => {
-    return (
-            <div className="mainPager">
-                <Header />
-                <Main />
-            </div>
-    );
+  return (
+    <>
+        <Main/>
+    </>
+  );
 };
-
 export default Index;
