@@ -6,8 +6,7 @@ export const TextFieldStyled = styled(TextField)`
   border: none;
   border-radius: 5px;
   background-color: white;
-
-  .MuiTextField-root.Mui-focused{
-    border-color: red;
+  input{
+    color: #5660C1;
   }
 `

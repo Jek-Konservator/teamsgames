@@ -1,12 +1,8 @@
 import React from "react";
-import { NewRoomComponent } from "../src/components/newRoomComponent";
+import {EditRoomComponent} from "../src/components/rooms/editRoomComponent";
 
 const NewRoom = () => {
-  return (
-    <>
-      <NewRoomComponent />
-    </>
-  );
+  return <EditRoomComponent />;
 };
 
 export default NewRoom;

@@ -1,6 +1,6 @@
-import {ButtonStyled} from "./button.module";
+import {ButtonStyled} from "./buttonStyled.module";
 
-export const ButtonKit  = (props) =>{
+export const ButtonKit = (props) =>{
     return(
             <ButtonStyled {...props}/>
     )

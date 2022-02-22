@@ -1,14 +1,30 @@
-import { GlobalStyle, MainContainer } from "../src/globalStyle";
+import { GlobalStyle, MainContainer, theme } from "../src/globalStyle";
 import { Header } from "../src/components/header";
+import { ThemeProvider } from "@mui/material";
+import axios from "axios";
+import getConfig from "next/config";
+import { Provider } from "react-redux";
+import { store } from "../src/toolKitRedux/index";
 
-export default function MyApp({ Component, pageProps }) {
+const MyApp = ({ Component, pageProps }) => {
+  const { publicRuntimeConfig } = getConfig();
+
+  axios.create({
+    baseURL: publicRuntimeConfig.backendUrl,
+  });
+
   return (
     <>
-      <GlobalStyle />
-      <Header />
-      <MainContainer>
-        <Component {...pageProps} />
-      </MainContainer>
+      <ThemeProvider theme={theme}>
+        <Provider store={store}>
+          <GlobalStyle />
+          <Header />
+          <MainContainer>
+            <Component {...pageProps} />
+          </MainContainer>
+        </Provider>
+      </ThemeProvider>
     </>
   );
-}
+};
+export default MyApp;

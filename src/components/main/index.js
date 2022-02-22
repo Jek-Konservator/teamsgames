@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./mainStyle.module";
 import Link from "next/link";
 
@@ -8,26 +8,57 @@ import {
   ButtonNewRoomStyled,
   MainStyled,
 } from "./mainStyle.module";
-import { ButtonKit } from "../../UIKit/button";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import { useRouter } from "next/router";
 
 export const Main = () => {
-  const noGameRooms = () => {
-    console.log("no Game Rooms");
+  const [gameSelected, setGameSelected] = useState("");
+  const { userType, userInfo } = useSelector(({ mainReducer }) => mainReducer);
+  const router = useRouter();
+
+  const goToUserRoom = () => {
+    axios
+      .get(`api/rooms/getUserRoom?userId=${userInfo._id}`)
+      .then(({ data }) => router.push(`/gameRoom/${data.docs._id}`))
+      .catch(({ data }) => console.log(data));
+  };
+
+  const goToGameRoom = () => {
+    if (gameSelected !== "") {
+      axios
+        .get(`api/rooms/getRoom?gameName=${gameSelected}`)
+        .then(({ data }) => router.push(`/gameRoom/${data.docs._id}`))
+        .catch(({ data }) => console.log(data));
+    } else {
+      console.log("игра не выбрана");
+    }
   };
 
   return (
     <MainStyled>
-      <ButtonGoGameStyled className="buttonGoGameStyled">
+      <ButtonGoGameStyled onClick={() => goToGameRoom()}>
         Играть
       </ButtonGoGameStyled>
-
-      <GameSelect sx={{ width: "200px" }} />
-      <Link href="newRoom">
-        <ButtonNewRoomStyled className="buttonNewRoomStyled">
-          Создать комнату
+      <GameSelect
+        sx={{ width: "200px" }}
+        onChange={(e) => setGameSelected(e.target.innerText)}
+      />
+      {userType === "userGhost" ? (
+        <ButtonNewRoomStyled
+          onClick={() => {
+            goToUserRoom();
+          }}
+        >
+          Моя комната
         </ButtonNewRoomStyled>
-      </Link>
+      ) : (
+        <Link href="newRoom">
+          <ButtonNewRoomStyled>Создать комнату</ButtonNewRoomStyled>
+        </Link>
+      )}
     </MainStyled>
   );
 };
-//todo сделать тему для MUI
+
+//todo main е получает userId

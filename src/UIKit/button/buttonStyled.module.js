@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Button } from "@mui/material";
 export const ButtonStyled = styled(Button)`
-  width: 150px;
+  min-width: 150px;
   height: 40px;
   margin: 10px;
   border: none;
