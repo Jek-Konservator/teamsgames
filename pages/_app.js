@@ -28,3 +28,4 @@ const MyApp = ({ Component, pageProps }) => {
   );
 };
 export default MyApp;
+//todo либо играть либо личная комната хранить id (участники комнаты) TS soketIO

@@ -3,20 +3,53 @@ import { getCookie, setCookies } from "cookies-next";
 import { v4 } from "uuid";
 export default (req, res) => {
   const { roomName, gameName, userLogin, maxUsers, message } = req.body;
+
   if (userLogin === "Ghost") {
     if (getCookie("ghostId", { req, res })) {
-      res.status(200).json({ status: "err", message: "userHasRoom" });
+      dataRooms.findOne(
+        { ghostID: getCookie("ghostId", { req, res }) },
+        (err, docs) => {
+          if (err) {
+            res.status(400);
+          } else {
+            if (docs) {
+              res.status(200).json({ status: "err", message: "userHasRoom" });
+            } else {
+              dataRooms.insert(
+                {
+                  roomName,
+                  gameName,
+                  ownerId: getCookie("ghostId", { req, res }),
+                  maxUsers,
+                  users: [getCookie("ghostId", { req, res })],
+                  message,
+                  roomIsFull: false,
+                  ghostId: getCookie("ghostId", { req, res }),
+                },
+                (err, newDoc) => {
+                  if (err) {
+                    res.status(400);
+                  } else {
+                    res.status(201).json({ status: "ok", newDoc });
+                  }
+                }
+              );
+            }
+          }
+        }
+      );
     } else {
+      const ghostId = v4();
       dataRooms.insert(
         {
           roomName,
           gameName,
-          ownerLogin: userLogin,
+          ownerId: ghostId,
           maxUsers,
-          users: [userLogin],
+          users: [ghostId],
           message,
           roomIsFull: false,
-          ghostId: v4(),
+          ghostId: ghostId,
         },
         (err, newDoc) => {
           if (err) {

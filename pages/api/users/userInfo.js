@@ -1,4 +1,4 @@
-import { dataUsers } from "../../../database/database";
+import { dataRooms, dataUsers } from "../../../database/database";
 import { getCookie, getCookies } from "cookies-next";
 
 export default (req, res) => {
@@ -12,8 +12,21 @@ export default (req, res) => {
       }
     });
   } else if (getCookie("ghostId", { req, res })) {
-    const docs = getCookie("ghostId", { req, res });
-    res.status(200).json({ status: "userGhost", docs });
+    let ghostId = getCookie("ghostId", { req, res });
+    dataRooms.findOne({ ownerId: ghostId }, (err, docs) => {
+      if (err) {
+        res.status(400);
+      } else {
+        if (docs) {
+          res.status(200).json({
+            status: "userGhost",
+            docs: { _id: ghostId, idUserRoom: docs._id },
+          });
+        } else {
+          res.status(200).json({ status: "userGhost", docs: { _id: ghostId } });
+        }
+      }
+    });
   } else {
     res.status(200).json({ status: "userUndefined" });
   }

@@ -14,6 +14,7 @@ import { TextFieldKit } from "../../../UIKit/textField";
 import { ButtonKit } from "../../../UIKit/button";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import {userCreateRoom} from "../../../toolKitRedux/toolKitSlice";
 
 export const EditRoomComponent = ({ setRoomEdit, roomEditInfo }) => {
   const [roomInfo, setRoomInfo] = useState(
@@ -33,6 +34,7 @@ export const EditRoomComponent = ({ setRoomEdit, roomEditInfo }) => {
   );
 
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const newRoom = () => {
     axios
@@ -45,6 +47,7 @@ export const EditRoomComponent = ({ setRoomEdit, roomEditInfo }) => {
       })
       .then(({ data }) => {
         if (data.status === "ok") {
+          dispatch(userCreateRoom({_id:data.newDoc._id}));
           router.push(`/gameRoom/${data.newDoc._id}`);
         } else {
           console.log(data.message);

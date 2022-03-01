@@ -8,7 +8,7 @@ export default (req, res) => {
             res.status(400)
         }else{
             if(docs){
-                    if(docs.ownerLogin === "Ghost" && docs.ghostId === getCookie("ghostId",{req,res})){
+                    if(docs.ghostId === getCookie("ghostId",{req,res})){
                         dataRooms.update({_id:roomId},{$set:{ roomName, gameName, maxUsers, message,}},{},(err, numReplaced)=>{
                             if(err){
                                 res.status(400)

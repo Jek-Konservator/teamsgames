@@ -10,7 +10,9 @@ export const useCheckUser = () => {
   if (userInfo._id !== getCookie("ghostId")) {
     return () => {
       axios.get("/api/users/userInfo").then(({ data }) => {
-        dispatch(setUserInfo({ userType: data.status, userInfo: data.docs }));
+        if (data.status !== "userUndefined") {
+          dispatch(setUserInfo({ userType: data.status, userInfo: data.docs }));
+        }
       });
     };
   } else {

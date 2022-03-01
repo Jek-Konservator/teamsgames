@@ -19,22 +19,27 @@ import Link from "next/link";
 import { ButtonNewRoomStyled } from "../../main/mainStyle.module";
 import { EditRoomComponent } from "../editRoomComponent";
 import { useRouter } from "next/router";
+import { getCookie } from "cookies-next";
+import { userRoomDelete } from "../../../toolKitRedux/toolKitSlice";
 
 export const GameRoomComponent = ({ roomInfo }) => {
   const [accepted, setAccepted] = useState(false);
   const [roomEdit, setRoomEdit] = useState(false);
 
   const userInfo = useSelector(({ mainReducer }) => mainReducer.userInfo);
-
+  const dispatch = useDispatch();
   const router = useRouter();
 
   const deleteRoom = () => {
     axios
       .delete(
-        `/api/rooms/deleteRoom?idRoom=${roomInfo._id}&ownerLogin=${roomInfo.ownerLogin}`
+        `/api/rooms/deleteRoom?idRoom=${roomInfo._id}&ownerId=${getCookie(
+          "ghostId"
+        )}`
       )
       .then(({ data }) => {
         if (data.status === "ok") {
+          dispatch(userRoomDelete());
           router.push(`/`);
         } else {
           console.log(data.message);
@@ -49,7 +54,6 @@ export const GameRoomComponent = ({ roomInfo }) => {
         <EditRoomComponent setRoomEdit={setRoomEdit} roomEditInfo={roomInfo} />
       ) : (
         <GoGameRoomComponentStyled>
-
           <GoGameRoomComponentContentStyled>
             <ButtonGoMainIcon />
             <div>
@@ -64,7 +68,9 @@ export const GameRoomComponent = ({ roomInfo }) => {
                 {roomInfo.users.map((user) => {
                   return (
                     <GoGameRoomComponentUsersInfoStyled key={user}>
-                      <div>{user}</div>
+                      <div>
+                       GHOST
+                      </div>
                     </GoGameRoomComponentUsersInfoStyled>
                   );
                 })}
@@ -77,7 +83,7 @@ export const GameRoomComponent = ({ roomInfo }) => {
                 </GoGameRoomComponentMessageToConnectStyled>
               ) : (
                 <GoGameRoomComponentControlButtonsStyled>
-                  {userInfo._id === roomInfo.ghostId ? (
+                  {userInfo._id === roomInfo.ownerId ? (
                     <>
                       <ButtonKit onClick={() => setRoomEdit(true)}>
                         Редактировать

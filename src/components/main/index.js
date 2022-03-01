@@ -44,7 +44,7 @@ export const Main = () => {
         sx={{ width: "200px" }}
         onChange={(e) => setGameSelected(e.target.innerText)}
       />
-      {userType === "userGhost" ? (
+      {userInfo.idUserRoom ? (
         <ButtonNewRoomStyled
           onClick={() => {
             goToUserRoom();

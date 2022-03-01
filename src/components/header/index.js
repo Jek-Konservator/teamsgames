@@ -28,7 +28,7 @@ export const Header = () => {
       <ImageLogoStyled>
         <Link href="/">
           <a>
-            <Image layout="intrinsic" src={logo} alt="logo" />
+            <Image  layout="intrinsic" src={logo} alt="logo" />
           </a>
         </Link>
       </ImageLogoStyled>

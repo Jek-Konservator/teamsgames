@@ -7,21 +7,28 @@ const toolKitSlice = createSlice({
     userType: "",
   },
   reducers: {
-    setUserInfo(state, action) {
-      if (action.payload.userType === "userGhost") {
+    setUserInfo(state, {payload}) {
+      if (payload.userType === "userGhost") {
         state.userType = "userGhost";
-        state.userInfo = { _id: action.payload.userInfo };
-      } else if (action.payload.userType === "userInfo") {
+        state.userInfo = payload.userInfo;
+      } else if (payload.userType === "userInfo") {
         state.userType = "userInfo";
-        state.userInfo = action.payload.userInfo;
+        state.userInfo = payload.userInfo;
       } else {
         state.userType = "";
         state.userInfo = {};
       }
+    },
+    userRoomDelete(state) {
+      state.userInfo = {...state.userInfo, idUserRoom:""};
+    },
+    userCreateRoom(state, {payload}) {
+      console.log(payload)
+      state.userInfo.idUserRoom = payload._id;
     },
   },
 });
 
 export default toolKitSlice.reducer;
 
-export const { setUserInfo } = toolKitSlice.actions;
+export const { setUserInfo,userRoomDelete,userCreateRoom } = toolKitSlice.actions;
