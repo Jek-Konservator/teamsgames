@@ -21,7 +21,7 @@ import { EditRoomComponent } from "../editRoomComponent";
 import { useRouter } from "next/router";
 import { getCookie } from "cookies-next";
 import { userRoomDelete } from "../../../toolKitRedux/toolKitSlice";
-
+import {io} from "socket.io-client"
 export const GameRoomComponent = ({ roomInfo }) => {
   const [accepted, setAccepted] = useState(false);
   const [roomEdit, setRoomEdit] = useState(false);
@@ -29,6 +29,7 @@ export const GameRoomComponent = ({ roomInfo }) => {
   const userInfo = useSelector(({ mainReducer }) => mainReducer.userInfo);
   const dispatch = useDispatch();
   const router = useRouter();
+  const socket = io("http://localhost:3000/api");
 
   const deleteRoom = () => {
     axios
@@ -47,6 +48,7 @@ export const GameRoomComponent = ({ roomInfo }) => {
       })
       .catch(() => console.log(Error));
   };
+
 
   return (
     <>
@@ -94,7 +96,9 @@ export const GameRoomComponent = ({ roomInfo }) => {
                     </>
                   ) : (
                     <>
-                      <ButtonKit>Принять</ButtonKit>
+                      <ButtonKit onClick={()=>{ socket.on("connect",(socket)=>{
+                        console.log(socket)
+                      })}}>Принять</ButtonKit>
                       <ButtonKit>Следующая</ButtonKit>
                     </>
                   )}
