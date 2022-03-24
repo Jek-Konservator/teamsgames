@@ -12,7 +12,6 @@ export const HeaderStyled = styled("div")`
   box-sizing: border-box;
 `;
 export const ImageLogoStyled = styled("div")`
-  cursor: pointer;
   width: 160px;
 `;
 

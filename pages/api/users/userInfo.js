@@ -1,5 +1,5 @@
 import { dataRooms, dataUsers } from "../../../database/database";
-import { getCookie, getCookies } from "cookies-next";
+import { getCookie } from "cookies-next";
 
 export default (req, res) => {
   if (getCookie("userId", { req, res })) {

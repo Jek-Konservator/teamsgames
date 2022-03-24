@@ -26,11 +26,7 @@ export const Header = () => {
   return (
     <HeaderStyled>
       <ImageLogoStyled>
-        <Link href="/">
-          <a>
-            <Image  layout="intrinsic" src={logo} alt="logo" />
-          </a>
-        </Link>
+        <Image layout="intrinsic" src={logo} alt="logo" />
       </ImageLogoStyled>
       <div>
         <ButtonProfileStyled className="buttonProfileStyled">

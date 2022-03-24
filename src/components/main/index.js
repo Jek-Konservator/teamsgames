@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "./mainStyle.module";
 import Link from "next/link";
 
@@ -8,14 +8,17 @@ import {
   ButtonNewRoomStyled,
   MainStyled,
 } from "./mainStyle.module";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { useRouter } from "next/router";
+import { gameSelect } from "../../toolKitRedux/toolKitSlice";
 
 export const Main = () => {
-  const [gameSelected, setGameSelected] = useState("");
-  const { userType, userInfo } = useSelector(({ mainReducer }) => mainReducer);
+  const { gameSelected, userInfo } = useSelector(
+    ({ mainReducer }) => mainReducer
+  );
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const goToUserRoom = () => {
     axios
@@ -27,8 +30,8 @@ export const Main = () => {
   const goToGameRoom = () => {
     if (gameSelected !== "") {
       axios
-        .get(`api/rooms/getRoom?gameName=${gameSelected}`)
-        .then(({ data }) => router.push(`/gameRoom/${data.docs._id}`))
+        .get(`api/rooms/getRooms?gameName=${gameSelected}`)
+        .then(({ data }) => router.push(`/gameRoom/${data._id}`))
         .catch(({ data }) => console.log(data));
     } else {
       console.log("игра не выбрана");
@@ -42,7 +45,7 @@ export const Main = () => {
       </ButtonGoGameStyled>
       <GameSelect
         sx={{ width: "200px" }}
-        onChange={(e) => setGameSelected(e.target.innerText)}
+        onChange={(e) => dispatch(gameSelect(e.target.innerText))}
       />
       {userInfo.idUserRoom ? (
         <ButtonNewRoomStyled

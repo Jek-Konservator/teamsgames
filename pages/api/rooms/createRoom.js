@@ -6,38 +6,36 @@ export default (req, res) => {
 
   if (userLogin === "Ghost") {
     if (getCookie("ghostId", { req, res })) {
-      dataRooms.findOne(
-        { ghostID: getCookie("ghostId", { req, res }) },
-        (err, docs) => {
-          if (err) {
-            res.status(400);
+      const ghostId = getCookie("ghostId", { req, res });
+      dataRooms.findOne({ ghostId }, (err, docs) => {
+        if (err) {
+          res.status(400);
+        } else {
+          if (docs) {
+            res.status(200).json({ status: "err", message: "userHasRoom" });
           } else {
-            if (docs) {
-              res.status(200).json({ status: "err", message: "userHasRoom" });
-            } else {
-              dataRooms.insert(
-                {
-                  roomName,
-                  gameName,
-                  ownerId: getCookie("ghostId", { req, res }),
-                  maxUsers,
-                  users: [getCookie("ghostId", { req, res })],
-                  message,
-                  roomIsFull: false,
-                  ghostId: getCookie("ghostId", { req, res }),
-                },
-                (err, newDoc) => {
-                  if (err) {
-                    res.status(400);
-                  } else {
-                    res.status(201).json({ status: "ok", newDoc });
-                  }
+            dataRooms.insert(
+              {
+                roomName,
+                gameName,
+                ownerId: ghostId,
+                maxUsers,
+                users: [ghostId],
+                message,
+                roomIsFull: false,
+                ghostId,
+              },
+              (err, newDoc) => {
+                if (err) {
+                  res.status(400);
+                } else {
+                  res.status(201).json({ status: "ok", newDoc });
                 }
-              );
-            }
+              }
+            );
           }
         }
-      );
+      });
     } else {
       const ghostId = v4();
       dataRooms.insert(

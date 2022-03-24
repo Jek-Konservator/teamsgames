@@ -1,4 +1,5 @@
 import { Server } from "socket.io";
+import axios from "axios";
 
 const ioHandler = (req, res) => {
   if (!res.socket.server.io) {
@@ -7,22 +8,53 @@ const ioHandler = (req, res) => {
     const io = new Server(res.socket.server);
 
     io.on("connection", (socket) => {
-      console.log("a user connected");
-
-      socket.on("connectToRoom", ({ msg }) => {
-        console.log(msg);
-
-        socket.emit("connectedToRoom", {
-          msg: "Success connect",
+      socket.on("acceptRoom", ({ idRoom }) => {
+        socket.join(idRoom);
+        socket.emit("userAccepted", {
+          idRoom: idRoom,
         });
       });
+      socket.on("disconnect", (reason) => {
+        console.log(reason, 123123);
+      });
+      socket.on("editRoom", ({idRoom}) => {
+        socket.to(idRoom).emit("editedRoom");
+        socket.emit("editedRoom");
+      });
+      socket.on("roomDelete", ({idRoom}) => {
+        socket.to(idRoom).emit("roomDelete");
+        socket.emit("roomDelete");
+      });
 
-      socket.on("disconnectFromRoom", ({ msg }) => {
-        console.log(msg);
+      socket.on("exitTheRoom", ({ idRoom, idUser }) => {
+        socket.leave(idRoom);
+        axios
+          .put(
+            `http://localhost:3000/api/rooms/userExitTheRoom?idRoom=${idRoom}&idUser=${idUser}`
+          )
+          .then(({ data }) => {
+            if (data.status === "ok") {
+              socket.to(idRoom).emit("updateUsers");
+              socket.emit("exitedTheRoom")
+            } else {
+              console.log("err");
+            }
+          });
+      });
 
-        socket.emit("disconnectedFromRoom", {
-          msg: "Success disconnect",
-        });
+      socket.on("newUserAccepted", ({ idRoom, idUser }) => {
+        axios
+          .put(
+            `http://localhost:3000/api/rooms/userAccept?idRoom=${idRoom}&idUser=${idUser}`
+          )
+          .then(({ data }) => {
+            if (data.status === "ok") {
+              socket.emit("updateUsers");
+              socket.to(idRoom).emit("updateUsers");
+            } else {
+              console.log("err");
+            }
+          });
       });
     });
 

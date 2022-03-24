@@ -1,29 +1,46 @@
 import { dataRooms } from "../../../database/database";
+import { getCookie, setCookies } from "cookies-next";
+import { v4 } from "uuid";
 
 export default (req, res) => {
-  const { idRoom, idUser } = req.query;
-  dataRooms.findOne({ _id: idRoom, roomIsFull: false }, (err, docs) => {
-    if (err) {
-      res.status(400).json(err);
+  let { idRoom, idUser } = req.query;
+  if (!idUser) {
+    if (getCookie("ghostId", { req, res })) {
+      idUser = getCookie("ghostId", { req, res });
     } else {
-      if (docs) {
-        dataRooms.update(
-          { _id: idRoom },
-          docs.users.length + 1 === docs.maxUsers
-            ? { $set: { roomIsFull: true }, $push: { users: idUser } }
-            : { $push: { users: idUser } },
-          {},
-          function (err, numReplaced) {
-            if (err) {
-              res.status(400);
-            } else {
-              res.status(200).json({ message: "userConnected" });
-            }
-          }
-        );
-      } else {
-        res.status(200).json({ message: "roomsFull" });
-      }
+      idUser = v4();
+      setCookies("ghostId", idUser, { req, res });
     }
-  });
+  }
+
+  if (idUser) {
+    dataRooms.findOne({ _id: idRoom, roomIsFull: false }, (err, docs) => {
+      if (err) {
+        res.status(400);
+      } else {
+        if (docs) {
+          dataRooms.update(
+            { _id: idRoom },
+            docs.users.length + 1 >= docs.maxUsers
+              ? { $set: { roomIsFull: true }, $push: { users: idUser } }
+              : { $push: { users: idUser } },
+            {},
+             (err, numReplaced)=> {
+              if (err) {
+                res.status(400);
+              } else {
+                res
+                  .status(200)
+                  .json({ status: "ok", message: "userConnected" });
+              }
+            }
+          );
+        } else {
+          res.status(200).json({ status: "ok", message: "roomsFull" });
+        }
+      }
+    });
+  } else {
+    res.status(400);
+  }
 };

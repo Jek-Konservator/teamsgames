@@ -5,6 +5,7 @@ const toolKitSlice = createSlice({
   initialState: {
     userInfo: {},
     userType: "",
+    gameSelected: "",
   },
   reducers: {
     setUserInfo(state, {payload}) {
@@ -23,12 +24,14 @@ const toolKitSlice = createSlice({
       state.userInfo = {...state.userInfo, idUserRoom:""};
     },
     userCreateRoom(state, {payload}) {
-      console.log(payload)
       state.userInfo.idUserRoom = payload._id;
+    },
+    gameSelect(state, {payload}) {
+      state.gameSelected =payload;
     },
   },
 });
 
 export default toolKitSlice.reducer;
 
-export const { setUserInfo,userRoomDelete,userCreateRoom } = toolKitSlice.actions;
+export const { setUserInfo,userRoomDelete,userCreateRoom,gameSelect } = toolKitSlice.actions;

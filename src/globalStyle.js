@@ -14,10 +14,7 @@ export const GlobalStyle = createGlobalStyle`
     -webkit-appearance: none;
   }
 `;
-export const MainContainer = styled("div")`
-  width: 100%;
-  height: calc(100vh - 50px);
-`;
+
 
 export const theme = createTheme({
   palette: {

@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./gameRoomStyle.module";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { v4 } from "uuid";
+
 import {
   GoGameRoomComponentContentStyled,
   GoGameRoomComponentControlButtonsStyled,
@@ -15,33 +15,33 @@ import {
 } from "./gameRoomStyle.module";
 import { ButtonKit } from "../../../UIKit/button";
 import { ButtonGoMainIcon } from "../../../UIKit/buttonGoMainIcon";
-import Link from "next/link";
-import { ButtonNewRoomStyled } from "../../main/mainStyle.module";
+
 import { EditRoomComponent } from "../editRoomComponent";
 import { useRouter } from "next/router";
 import { getCookie } from "cookies-next";
 import { userRoomDelete } from "../../../toolKitRedux/toolKitSlice";
-import {io} from "socket.io-client"
-export const GameRoomComponent = ({ roomInfo }) => {
-  const [accepted, setAccepted] = useState(false);
-  const [roomEdit, setRoomEdit] = useState(false);
+import io from "socket.io-client";
 
-  const userInfo = useSelector(({ mainReducer }) => mainReducer.userInfo);
+export const GameRoomComponent = ({ roomInfo }) => {
+  const [componentRoomInfo, setComponentRoomInfo] = useState(roomInfo);
+  const [editRoom, setEditRoom] = useState(false);
+  const { userInfo, gameSelected } = useSelector(
+    ({ mainReducer }) => mainReducer
+  );
   const dispatch = useDispatch();
   const router = useRouter();
-  const socket = io("http://localhost:3000/api");
-
+  const socket = io();
   const deleteRoom = () => {
     axios
       .delete(
-        `/api/rooms/deleteRoom?idRoom=${roomInfo._id}&ownerId=${getCookie(
-          "ghostId"
-        )}`
+        `/api/rooms/deleteRoom?idRoom=${
+          componentRoomInfo._id
+        }&ownerId=${getCookie("ghostId")}`
       )
       .then(({ data }) => {
         if (data.status === "ok") {
           dispatch(userRoomDelete());
-          router.push(`/`);
+          socket.emit("roomDelete", { idRoom: componentRoomInfo._id });
         } else {
           console.log(data.message);
         }
@@ -49,45 +49,152 @@ export const GameRoomComponent = ({ roomInfo }) => {
       .catch(() => console.log(Error));
   };
 
+  const goToGameRoom = () => {
+    if (gameSelected !== "") {
+      axios
+        .get(
+          `/api/rooms/getRooms?gameName=${gameSelected}&roomId=${componentRoomInfo._id}`
+        )
+        .then(({ data }) => router.push(`/gameRoom/${data._id}`))
+        .catch(({ data }) => console.log(data));
+    } else {
+      console.log("игра не выбрана");
+      router.push("/")
+    }
+  };
+
+  const acceptRoom = async () => {
+    socketSubscriptions();
+    socket.on("userAccepted", ({ idRoom }) => {
+      socket.emit("newUserAccepted", {
+        idRoom,
+        idUser: getCookie("ghostId"),
+      });
+    });
+  };
+
+  const socketSubscriptions = () => {
+    socket.emit("acceptRoom", { idRoom: componentRoomInfo._id });
+    socket.on("updateUsers", () => {
+      axios(`/api/rooms/getRoom?roomId=${componentRoomInfo._id}`).then(
+        ({ data }) => {
+          setComponentRoomInfo({
+            ...componentRoomInfo,
+            users: data.docs.users,
+          });
+        }
+      );
+    });
+    socket.on("exitedTheRoom", () => {
+      router.push("/");
+    });
+    socket.on("roomDelete", () => {
+      router.push("/");
+    });
+    socket.on("editedRoom", () => {
+      console.log(555);
+      axios(`/api/rooms/getRoom?roomId=${componentRoomInfo._id}`).then(
+        ({ data }) => {
+          setComponentRoomInfo({
+            ...componentRoomInfo,
+            gameName: data.docs.gameName,
+            maxUsers: data.docs.maxUsers,
+            message: data.docs.message,
+            roomName: data.docs.roomName,
+          });
+          setEditRoom(false);
+        }
+      );
+    });
+  };
+
+  const exitTheRoom = async () => {
+    if (userInfo._id === roomInfo.ownerId) {
+      router.push("/");
+    } else {
+      socket.emit("exitTheRoom", {
+        idRoom: componentRoomInfo._id,
+        idUser: getCookie("ghostId"),
+      });
+    }
+  };
+
+  const funcEditRoom = async () => {
+    socket.emit("editRoom", {
+      idRoom: roomInfo._id,
+    });
+  };
+
+  const roomOwnerLogin = async () => {
+    socketSubscriptions();
+    socket.on("userAccepted", ({ idRoom }) => {
+      console.log("room Owner Login", idRoom);
+    });
+  };
+
+  useEffect(() => {
+    userInfo._id === roomInfo.ownerId && roomOwnerLogin();
+    componentRoomInfo.users.includes(userInfo._id) &&
+      componentRoomInfo.ownerId !== userInfo._id &&
+      socketSubscriptions();
+  }, [userInfo]);
+
+  useEffect(() => {
+    JSON.stringify(componentRoomInfo) !== JSON.stringify(roomInfo) &&
+      setComponentRoomInfo(roomInfo);
+  }, [roomInfo]);
 
   return (
     <>
-      {roomEdit ? (
-        <EditRoomComponent setRoomEdit={setRoomEdit} roomEditInfo={roomInfo} />
+      {editRoom ? (
+        <EditRoomComponent
+          funcEditRoom={funcEditRoom}
+          roomEditInfo={componentRoomInfo}
+        />
       ) : (
         <GoGameRoomComponentStyled>
           <GoGameRoomComponentContentStyled>
-            <ButtonGoMainIcon />
+            <ButtonGoMainIcon
+              onClick={() => {
+                exitTheRoom();
+              }}
+            />
             <div>
               <GoGameRoomComponentInfoStyled>
-                <div>{roomInfo.roomName}</div>
-                <div>{roomInfo.gameName}</div>
+                <div>{componentRoomInfo.roomName}</div>
+                <div>{componentRoomInfo.gameName}</div>
               </GoGameRoomComponentInfoStyled>
               <GoGameRoomComponentNumberUsersStyled>
-                {`${roomInfo.users.length}/${roomInfo.maxUsers}`}
+                {`${componentRoomInfo.users.length}/${componentRoomInfo.maxUsers}`}
               </GoGameRoomComponentNumberUsersStyled>
               <GoGameRoomComponentUsersStyled>
-                {roomInfo.users.map((user) => {
+                {componentRoomInfo.users.map((user) => {
                   return (
                     <GoGameRoomComponentUsersInfoStyled key={user}>
-                      <div>
-                       GHOST
-                      </div>
+                      <div>GHOST</div>
                     </GoGameRoomComponentUsersInfoStyled>
                   );
                 })}
               </GoGameRoomComponentUsersStyled>
             </div>
             <div>
-              {accepted ? (
+              {componentRoomInfo.users.includes(userInfo._id) &&
+              componentRoomInfo.ownerId !== userInfo._id ? (
                 <GoGameRoomComponentMessageToConnectStyled>
-                  {roomInfo.message}
+                  {componentRoomInfo.message}
+                  <ButtonKit
+                    onClick={() => {
+                      exitTheRoom();
+                    }}
+                  >
+                    Выход
+                  </ButtonKit>
                 </GoGameRoomComponentMessageToConnectStyled>
               ) : (
                 <GoGameRoomComponentControlButtonsStyled>
-                  {userInfo._id === roomInfo.ownerId ? (
+                  {userInfo._id === componentRoomInfo.ownerId ? (
                     <>
-                      <ButtonKit onClick={() => setRoomEdit(true)}>
+                      <ButtonKit onClick={() => setEditRoom(true)}>
                         Редактировать
                       </ButtonKit>
                       <ButtonKit onClick={() => deleteRoom()}>
@@ -96,10 +203,16 @@ export const GameRoomComponent = ({ roomInfo }) => {
                     </>
                   ) : (
                     <>
-                      <ButtonKit onClick={()=>{ socket.on("connect",(socket)=>{
-                        console.log(socket)
-                      })}}>Принять</ButtonKit>
-                      <ButtonKit>Следующая</ButtonKit>
+                      <ButtonKit
+                        onClick={() => {
+                          acceptRoom();
+                        }}
+                      >
+                        Принять
+                      </ButtonKit>
+                      <ButtonKit onClick={() => goToGameRoom()}>
+                        Следующая
+                      </ButtonKit>
                     </>
                   )}
                 </GoGameRoomComponentControlButtonsStyled>
@@ -118,7 +231,7 @@ export const GameRoomComponent = ({ roomInfo }) => {
       .then(({ data }) => {
         if (data) {
           console.log(data);
-          setRoomInfo(data);
+          setcomponentRoomInfo(data);
         } else {
           noGameRooms();
           dispatch({ type: "closeModal", data: "visibleGoGameModal" });
@@ -132,7 +245,7 @@ export const GameRoomComponent = ({ roomInfo }) => {
 /*const userAccept = () => {
   axios
     .get(
-      `/app/userAccept?idRoom=${roomInfo._id}&idUser=${
+      `/app/userAccept?idRoom=${componentRoomInfo._id}&idUser=${
         userLogin ? userLogin : v4()
       }`
     )

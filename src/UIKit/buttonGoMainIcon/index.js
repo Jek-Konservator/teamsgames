@@ -1,10 +1,10 @@
 import Link from "next/link";
 import {CloseIconStyled} from "./buttonGoMainIconStyled.module";
 
-export const ButtonGoMainIcon  = () =>{
+export const ButtonGoMainIcon  = (props) =>{
     return(
         <Link href="/">
-            <CloseIconStyled/>
+            <CloseIconStyled {...props}/>
         </Link>
 
     )

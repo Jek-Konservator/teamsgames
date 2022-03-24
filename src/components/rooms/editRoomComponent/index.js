@@ -14,9 +14,9 @@ import { TextFieldKit } from "../../../UIKit/textField";
 import { ButtonKit } from "../../../UIKit/button";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import {userCreateRoom} from "../../../toolKitRedux/toolKitSlice";
+import { userCreateRoom } from "../../../toolKitRedux/toolKitSlice";
 
-export const EditRoomComponent = ({ setRoomEdit, roomEditInfo }) => {
+export const EditRoomComponent = ({ funcEditRoom, roomEditInfo }) => {
   const [roomInfo, setRoomInfo] = useState(
     roomEditInfo
       ? {
@@ -47,7 +47,7 @@ export const EditRoomComponent = ({ setRoomEdit, roomEditInfo }) => {
       })
       .then(({ data }) => {
         if (data.status === "ok") {
-          dispatch(userCreateRoom({_id:data.newDoc._id}));
+          dispatch(userCreateRoom({ _id: data.newDoc._id }));
           router.push(`/gameRoom/${data.newDoc._id}`);
         } else {
           console.log(data.message);
@@ -72,8 +72,7 @@ export const EditRoomComponent = ({ setRoomEdit, roomEditInfo }) => {
         })
         .then(({ data }) => {
           if (data.status === "ok") {
-            router.push(`/gameRoom/${roomEditInfo._id}`);
-            setRoomEdit(false);
+              funcEditRoom();
           }
         })
         .catch(({ err }) => console.log(err));
